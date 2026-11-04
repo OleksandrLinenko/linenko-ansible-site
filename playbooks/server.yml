@@ -1,0 +1,18 @@
+- name: Configure my server
+  hosts: dori.nti.tul.cz
+  become: true
+
+  tasks:
+    - name: Add EPEL repository
+      ansible.builtin.yum_repository:
+        name: epel
+        description: Extra Packages for Enterprise Linux 10
+        metalink: https://mirrors.fedoraproject.org/metalink?repo=epel-10&arch=$basearch
+        enabled: true
+        gpgcheck: true
+        gpgkey: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-10
+
+    - name: Install cowsay
+      ansible.builtin.dnf:
+        name: cowsay
+        state: present
