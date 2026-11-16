@@ -1,0 +1,5 @@
+---
+user_name: shurix
+
+user_ssh_keys:
+  - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGnuUBH9ZlfPlVkCQ+lh4LqkUiueffpetOZTVU6SB/Yp oleksandrlinenko@MacBook-Air-Oleksandr.local"
