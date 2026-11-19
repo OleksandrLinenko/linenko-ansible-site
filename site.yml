@@ -4,3 +4,4 @@
 # The imported playbooks must be idempotent as site.yml may be run repeatedly for periodic remediation.
 - import_playbook: playbooks/server.yml
 - import_playbook: playbooks/users.yml
+- import_playbook: playbooks/samba.yml

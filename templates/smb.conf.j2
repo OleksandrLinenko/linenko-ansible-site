@@ -1,0 +1,19 @@
+[global]
+    workgroup = {{ samba_workgroup }}
+    server string = Samba Server
+    server role = standalone server
+    security = user
+    passdb backend = tdbsam
+
+{% for share in samba_shares %}
+[{{ share.name }}]
+    path = {{ share.path }}
+    browseable = {{ share.browseable }}
+    read only = {{ share.read_only }}
+    guest ok = {{ share.guest_ok }}
+    valid users = {{ share.valid_users }}
+    force group = {{ samba_group }}
+    create mask = 0660
+    directory mask = 0770
+
+{% endfor %}

@@ -1,0 +1,72 @@
+---
+- name: Configure Samba server
+  hosts: dori.nti.tul.cz
+  become: true
+
+  tasks:
+    - name: Install Samba and SELinux tools
+      ansible.builtin.dnf:
+        name:
+          - samba
+          - samba-client
+          - policycoreutils-python-utils
+        state: present
+    - name: Create Samba group
+      ansible.builtin.group:
+        name: "{{ samba_group }}"
+        state: present
+
+    - name: Create Samba user
+      ansible.builtin.user:
+        name: "{{ samba_user }}"
+        group: "{{ samba_group }}"
+        system: true
+        create_home: false
+        shell: /sbin/nologin
+        password: "!"
+        state: present
+
+    - name: Create Samba shared directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: root
+        group: "{{ samba_group }}"
+        mode: "2770"
+      loop: "{{ samba_shares }}"
+
+    - name: Configure SELinux context for Samba shares
+      community.general.sefcontext:
+        target: "{{ item.path }}(/.*)?"
+        setype: "{{ samba_selinux_type }}"
+        state: present
+      loop: "{{ samba_shares }}"
+
+    - name: Apply SELinux contexts
+      ansible.builtin.command:
+        cmd: "restorecon -Rv {{ item.path }}"
+      loop: "{{ samba_shares }}"
+      changed_when: false
+
+    - name: Configure Samba
+      ansible.builtin.template:
+        src: ../templates/smb.conf.j2
+        dest: /etc/samba/smb.conf
+        owner: root
+        group: root
+        mode: "0644"
+        validate: "testparm -s %s"
+
+    - name: Allow Samba in TUL firewall zone
+      ansible.posix.firewalld:
+        service: "{{ samba_firewall_service }}"
+        zone: "{{ samba_firewall_zone }}"
+        permanent: true
+        immediate: true
+        state: enabled
+
+    - name: Enable and start Samba
+      ansible.builtin.service:
+        name: smb
+        state: started
+        enabled: true

@@ -1,0 +1,17 @@
+---
+samba_user: sambauser
+samba_group: sambashare
+
+samba_workgroup: WORKGROUP
+
+samba_shares:
+  - name: public
+    path: /srv/samba/public
+    browseable: "yes"
+    read_only: "no"
+    guest_ok: "no"
+    valid_users: sambauser
+
+samba_firewall_zone: home
+samba_firewall_service: samba
+samba_selinux_type: samba_share_t
